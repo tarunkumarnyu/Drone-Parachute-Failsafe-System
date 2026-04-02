@@ -13,9 +13,10 @@ Built for the Mechatronics course (ROB-GY 5103) at NYU Tandon School of Engineer
 ## Demo
 
 <p align="center">
-  <img src="assets/prototype-top.png" width="45%" alt="Prototype Top View"/>
-  <img src="assets/prototype-side.png" width="45%" alt="Prototype Side View"/>
+  <img src="assets/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
 </p>
+
+https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/assets/parachute.mp4
 
 ## How It Works
 
