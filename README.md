@@ -16,7 +16,14 @@ Built for the Mechatronics course (ROB-GY 5103) at NYU Tandon School of Engineer
   <img src="assets/images/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
 </p>
 
-> Videos: [`demo_video.mp4`](assets/videos/demo_video.mp4) · [`landing_gear_testing_video.mp4`](assets/videos/landing_gear_testing_video.mp4) · [`updated_demo.mp4`](assets/videos/updated_demo.mp4)
+### Full Demo
+<video src="https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/raw/main/assets/videos/updated_demo.mp4" controls width="100%"></video>
+
+### Landing Gear Test
+<video src="https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/raw/main/assets/videos/landing_gear_testing_video.mp4" controls width="100%"></video>
+
+### System Overview
+<video src="https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/raw/main/assets/videos/demo_video.mp4" controls width="100%"></video>
 
 ## How It Works
 
