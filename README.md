@@ -84,11 +84,6 @@ The system runs three concurrent processes on the Parallax Propeller's multi-cor
 │       ├── landing_gear_testing_video.mp4
 │       ├── parachute_overview.mp4   # Parachute mechanism overview
 │       └── raw_test_footage.MOV     # Unedited test footage
-├── docs/
-│   ├── report/
-│   │   ├── Team - 9 Report_Project 2.pdf
-│   │   └── Team - 9 Report_Project 2-commented.pdf
-│   └── Project-2 ppt.pptx          # Final presentation
 └── README.md
 ```
 
