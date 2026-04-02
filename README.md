@@ -13,66 +13,82 @@ Built for the Mechatronics course (ROB-GY 5103) at NYU Tandon School of Engineer
 ## Demo
 
 <p align="center">
-  <img src="assets/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
+  <img src="assets/images/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
 </p>
 
-https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/assets/parachute.mp4
+> Videos: [`demo_video.mp4`](assets/videos/demo_video.mp4) · [`landing_gear_testing_video.mp4`](assets/videos/landing_gear_testing_video.mp4) · [`updated_demo.mp4`](assets/videos/updated_demo.mp4)
 
 ## How It Works
 
-**Stage 1 — Failure Detection**
+The system runs three concurrent processes on the Parallax Propeller's multi-core (cog) architecture:
 
-1. IMU (MPU6050) continuously monitors drone orientation and acceleration
-2. Detects sudden instability, unusual tilting, motor failure, or ESC burnout
-3. Triggers emergency sequence when imbalance exceeds safety threshold
+**Stage 1 — Failure Detection (Cog 2: IMU)**
 
-**Stage 2 — Parachute Deployment**
+1. MPU6050 reads Z-axis acceleration at 20 Hz via I2C
+2. Computes jerk (rate of change of acceleration) between consecutive readings
+3. Triggers emergency flag when jerk exceeds threshold (9000 units)
 
-1. Two servo motors (MG995) actuate topology-optimized plates on top of the drone
-2. Plates rotate 90° to release the parachute
-3. Parachute slows descent speed significantly
+**Stage 2 — Parachute Deployment (Main Cog)**
 
-**Stage 3 — Landing Gear Deployment**
+1. Main loop detects jerk flag from IMU cog
+2. Servo on Pin 2 rotates from 90° to 180°, releasing parachute
+3. Topology-optimized plates open to allow clean chute separation
 
-1. Ultrasonic sensors (HC-SR04) continuously measure ground distance
-2. At critical altitude (200 cm), four servo motors deploy retractable landing gear
+**Stage 3 — Landing Gear Deployment (Cog 1: Ultrasonic)**
+
+1. HC-SR04 on Pin 3 continuously measures ground distance via pulse timing
+2. When distance drops below 35 cm, servo on Pin 4 actuates landing gear
 3. Spring-suspended 3D-printed gear absorbs remaining impact force
 
 ## System Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│              Parallax Propeller              │
-│                (Main Controller)             │
-├──────────┬──────────┬───────────────────────┤
-│  P0/P1   │    P3    │     P4        P5      │
-│  (I2C)   │  (GPIO)  │   (PWM)     (PWM)     │
-│    │      │    │     │     │         │       │
-│  ┌─┴─┐  ┌─┴──┐  ┌──┴──┐  ┌──┴──┐          │
-│  │IMU│  │Ultra│  │4x   │  │2x   │          │
-│  │6050│  │sonic│  │Servo│  │Servo│          │
-│  └───┘  └────┘  │(Gear)│  │(Chute)│         │
-│                  └─────┘  └──────┘          │
-└─────────────────────────────────────────────┘
-         ↑ 5V from Buck Converter
-         ↑ 8.4V LiPo Battery
+┌──────────────────────────────────────────────────┐
+│               Parallax Propeller                 │
+│            (Multi-Cog Architecture)              │
+├────────────┬─────────────┬───────────────────────┤
+│   Cog 0    │    Cog 1    │        Cog 2          │
+│  Main Loop │  Ultrasonic │     IMU Reader         │
+│            │  measure_   │     read_imu()         │
+│  - Reads   │  distance() │                        │
+│    flags   │             │  - MPU6050 Z-accel     │
+│  - Actuates│  - HC-SR04  │  - Jerk computation    │
+│    servos  │    ping     │  - Sets jerk_detected  │
+│            │  - Updates  │    flag                 │
+│            │   distance  │                        │
+├────────────┼─────────────┼───────────────────────┤
+│  P0/P1     │     P3      │    P2         P4       │
+│  (I2C)     │   (GPIO)    │  (Servo)    (Servo)    │
+│    │       │     │       │    │          │        │
+│  ┌─┴──┐   │  ┌──┴───┐   │ ┌──┴───┐  ┌──┴───┐   │
+│  │IMU │   │  │Ultra │   │ │Chute │  │Gear  │   │
+│  │6050│   │  │sonic │   │ │Servo │  │Servo │   │
+│  └────┘   │  └──────┘   │ └──────┘  └──────┘   │
+└────────────┴─────────────┴───────────────────────┘
+          ↑ 5V from Buck Converter
+          ↑ 8.4V LiPo Battery
 ```
 
 ## Project Structure
 
 ```
 ├── firmware/
-│   ├── main.spin              # Main control loop (Propeller SPIN)
-│   ├── imu_driver.spin        # MPU6050 I2C interface
-│   ├── ultrasonic.spin        # HC-SR04 distance sensing
-│   └── servo_control.spin     # Servo actuation logic
-├── cad/
-│   ├── parachute_assembly/    # Topology-optimized plate mechanism
-│   ├── drone_frame/           # Custom drone frame (PLA-CF)
-│   └── landing_gear/          # Spring-suspended retractable gear
+│   ├── final_Project_2_code.c       # Main firmware — multi-cog control loop
+│   └── final_Project_2_code.side    # SimpleIDE project config
+├── assets/
+│   ├── images/
+│   │   └── parachute.png            # System overview image
+│   └── videos/
+│       ├── demo_video.mp4           # Full system demo
+│       ├── updated_demo.mp4         # Updated demo with improvements
+│       ├── landing_gear_testing_video.mp4
+│       ├── parachute_overview.mp4   # Parachute mechanism overview
+│       └── raw_test_footage.MOV     # Unedited test footage
 ├── docs/
-│   └── circuit_diagram.png    # Full wiring schematic
-├── assets/                    # Images and demo videos
+│   ├── report/
+│   │   ├── Team - 9 Report_Project 2.pdf
+│   │   └── Team - 9 Report_Project 2-commented.pdf
+│   └── Project-2 ppt.pptx          # Final presentation
 └── README.md
 ```
 
@@ -81,7 +97,7 @@ https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/assets/parachut
 | Component | Model | Qty | Purpose |
 |-----------|-------|-----|---------|
 | Microcontroller | Parallax Propeller | 1 | Real-time multi-cog processing |
-| IMU | MPU6050 | 1 | Instability detection |
+| IMU | MPU6050 | 1 | Instability / jerk detection |
 | Ultrasonic Sensor | HC-SR04 | 1 | Ground proximity measurement |
 | Servo Motor | MG995 | 6 | Parachute (2) + Landing gear (4) |
 | Battery | 8.4V LiPo | 1 | Main power supply |
@@ -96,22 +112,22 @@ https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/assets/parachut
 |-----------|-----|----------|
 | IMU (SDA/SCL) | P0, P1 | I2C |
 | Ultrasonic (Trig/Echo) | P3 | GPIO |
-| Landing Gear Servos (x4) | P4 | PWM |
-| Parachute Servos (x2) | P5 | PWM |
+| Landing Gear Servo | P4 | PWM |
+| Parachute Servo | P2 | PWM |
 
 ## Key Design Decisions
 
-- **Dual IMU redundancy** — External IMU cross-referenced with flight controller IMU eliminates single-point-of-failure in crash detection
+- **Multi-cog concurrent sensing** — IMU and ultrasonic run on dedicated Propeller cogs for true parallel real-time processing with zero blocking
+- **Jerk-based detection over tilt** — Computing acceleration derivative catches sudden failures (motor loss, ESC burnout) faster than absolute tilt thresholds
 - **Mars-Rover-inspired descent sequencing** — Multi-stage deployment (detect → chute → gear) mirrors proven planetary landing strategies
 - **Topology-optimized plates** — Reduced weight while maintaining structural integrity; minimizes drag from propeller airflow
-- **PLA-CF frame** — Carbon-fiber-filled PLA for high strength-to-weight ratio on custom 3D-printed components
 - **Spring-suspended landing gear** — Absorbs residual impact force that the parachute alone cannot eliminate
 
 ## Results
 
 - Prototype successfully detects imbalance and deploys parachute autonomously
 - Controlled tests show significant reduction in landing impact force
-- Landing gear deployment triggers reliably at 200 cm altitude threshold
+- Landing gear deployment triggers reliably at distance threshold
 - System responds to simulated motor failure, ESC burnout, and signal loss scenarios
 
 ## Future Work
@@ -124,7 +140,7 @@ https://github.com/tarunkumarnyu/Drone-Parachute-Failsafe-System/assets/parachut
 
 ## Stack
 
-`Parallax Propeller (SPIN)` · `MPU6050 IMU` · `HC-SR04 Ultrasonic` · `MG995 Servos` · `SolidWorks` · `3D Printing (PLA-CF)` · `LiPo Power System`
+`Parallax Propeller (C)` · `SimpleIDE` · `MPU6050 IMU` · `HC-SR04 Ultrasonic` · `MG995 Servos` · `SolidWorks` · `3D Printing (PLA-CF)` · `LiPo Power System`
 
 ## Team
 
