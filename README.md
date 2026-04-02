@@ -42,32 +42,9 @@ The system runs three concurrent processes on the Parallax Propeller's multi-cor
 
 ## System Architecture
 
-```
-┌──────────────────────────────────────────────────┐
-│               Parallax Propeller                 │
-│            (Multi-Cog Architecture)              │
-├────────────┬─────────────┬───────────────────────┤
-│   Cog 0    │    Cog 1    │        Cog 2          │
-│  Main Loop │  Ultrasonic │     IMU Reader         │
-│            │  measure_   │     read_imu()         │
-│  - Reads   │  distance() │                        │
-│    flags   │             │  - MPU6050 Z-accel     │
-│  - Actuates│  - HC-SR04  │  - Jerk computation    │
-│    servos  │    ping     │  - Sets jerk_detected  │
-│            │  - Updates  │    flag                 │
-│            │   distance  │                        │
-├────────────┼─────────────┼───────────────────────┤
-│  P0/P1     │     P3      │    P2         P4       │
-│  (I2C)     │   (GPIO)    │  (Servo)    (Servo)    │
-│    │       │     │       │    │          │        │
-│  ┌─┴──┐   │  ┌──┴───┐   │ ┌──┴───┐  ┌──┴───┐   │
-│  │IMU │   │  │Ultra │   │ │Chute │  │Gear  │   │
-│  │6050│   │  │sonic │   │ │Servo │  │Servo │   │
-│  └────┘   │  └──────┘   │ └──────┘  └──────┘   │
-└────────────┴─────────────┴───────────────────────┘
-          ↑ 5V from Buck Converter
-          ↑ 8.4V LiPo Battery
-```
+<p align="center">
+  <img src="assets/images/propeller-architecture.svg" width="80%" alt="Parallax Propeller Multi-Cog Architecture"/>
+</p>
 
 ## Project Structure
 
