@@ -8,6 +8,8 @@
 
 An autonomous emergency recovery system for UAVs that detects in-flight failures and deploys a parachute with retractable landing gear for controlled descent — no pilot intervention required.
 
+Built for the Mechatronics course (ROB-GY 5103) at NYU Tandon School of Engineering.
+
 <p align="center">
   <img src="assets/images/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
 </p>
