@@ -10,6 +10,14 @@ An autonomous emergency recovery system for UAVs that detects in-flight failures
 
 Built for the Mechatronics course (ROB-GY 5103) at NYU Tandon School of Engineering.
 
+## Overview
+
+Unmanned Aerial Vehicles are vulnerable to mid-flight failures — motor burnout, ESC faults, power loss — any of which can result in an uncontrolled crash. Conventional failsafes like return-to-home cannot recover from a dead motor or total power failure.
+
+This system addresses that gap with a hardware-level emergency recovery pipeline built around the Parallax Propeller's multi-cog architecture. An MPU6050 IMU detects sudden acceleration anomalies (jerk-based freefall detection), triggering autonomous parachute deployment via servo-actuated topology-optimized release plates. Simultaneously, an HC-SR04 ultrasonic sensor monitors ground proximity and deploys spring-suspended retractable landing gear at a calibrated altitude threshold to absorb residual impact energy.
+
+The entire pipeline — from failure detection to chute release to gear deployment — runs across dedicated parallel cogs with no shared blocking, achieving sub-100 ms end-to-end response latency.
+
 <p align="center">
   <img src="assets/images/parachute.png" width="60%" alt="Drone Failsafe Parachute System"/>
 </p>
